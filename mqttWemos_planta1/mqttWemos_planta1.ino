@@ -69,6 +69,7 @@ void loop() {
   uart_send_on_off();
   uart_receive_data();
   uart_receive_params();
+  mqtt_send_data();
 
   if(mqtt_in_getparams)
     mqtt_send_params();
@@ -165,6 +166,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     inmsg[length] = '\0';
     mqtt_in_onoff = inmsg == "1";
+    mqtt_in_onoff = true;
     
   } else if (topic == "plant1/get_parameters"){
       

@@ -145,9 +145,7 @@ void setup_wifi() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  client.subscribe("plant1/on_off");
-  client.subscribe("plant1/get_parameters");
-  client.subscribe("plant1/update_parameters");
+  
 }
 
 
@@ -203,7 +201,9 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
-      
+      client.subscribe("plant1/on_off");
+      client.subscribe("plant1/get_parameters");
+      client.subscribe("plant1/update_parameters");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());

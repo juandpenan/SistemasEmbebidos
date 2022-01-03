@@ -1,7 +1,7 @@
 // LIBRARIES 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include "SerialTranfer.h"
+#include "SerialTransfer.h"
 
 //MQTT COMMUNICATION PARAMETERS
 const char* ssid = "WIFI_4C";
@@ -17,7 +17,7 @@ PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
-bool mqtt_in_onoff;
+bool mqtt_in_onoff=true;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char data[20];

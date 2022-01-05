@@ -45,7 +45,7 @@ struct Data {
   long long Time;
   double KP;
   double TI;
-  long long TD;
+  double TD;
   char* ON_OFF;
 } send_params;
 
@@ -63,22 +63,25 @@ void loop() {
 }
 
 void comunicationIN(){
-    myTransfer.rxObj(send_params);
 
-    setp = send_params.SetP;
-    PV = send_params.PV;
-    CP = send_params.CP;
-    Kp = send_params.KP;
-    Ti = send_params.TI;
-    Td = send_params.TD;
-    uart_on_off = send_params.ON_OFF;  
+    if(myTransfer.available()){
+      myTransfer.rxObj(send_params);
+  
+      setp = send_params.SetP;
+      PV = send_params.PV;
+      CP = send_params.CP;
+      Kp = send_params.KP;
+      Ti = send_params.TI;
+      Td = send_params.TD;
+      uart_on_off = send_params.ON_OFF;
+    }  
 }
 
 void comunicationOUT(){
   long long now = 0; // time in seconds 
   uint16_t sendSize = 0;
   uint16_t sendSize1 = 0;
-  now = millis() / 1000.0;
+  now = (long long) millis() / 1000L;
 
   send_params.SetP = setp;
   send_params.PV = PV;
@@ -88,17 +91,10 @@ void comunicationOUT(){
   send_params.TI = Ti;
   send_params.TD = Td;
   send_params.ON_OFF = uart_on_off;
-  
-//  snprintf(bufferdata,50,"%f;%f;%f;%f",setp,PV,CP,now);
-//sprintf(bufferdata,"%d;%d;%d;%ld",(int)setp,(int)PV,(int)CP,(long long)now);
-// CAMBIA A PARAMETROS
-//  snprintf(bufferparameters,50,"%d;%d;%d;%d;%d",(int)setp,(int)Kp,(int)Ti,(int)Td,(int)uart_on_off);
-//  sendSize = myTransfer.txObj(bufferdata, sendSize);
-//  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
 
   myTransfer.sendDatum(send_params);
-//  Serial.print("SENDING: ");
-//  Serial.println(send_data);
+  Serial.print("SENDING: ");
+  Serial.println((int)send_params.Time);
 
 }
 
@@ -106,16 +102,7 @@ void PID() {
  myPID.SetSampleTime(Ts);
  myPID.SetTunings(Kp,Ti,Td);
  double tmp =analogRead(InputPin);
-// PV= (tmp*(100/1023.0));
+ PV= (tmp*(100/1023.0));
  myPID.Compute();
-// Serial.print("- Senal control: ");
-// Serial.println(CP);
  analogWrite(OutputPin,CP);
-// analogWrite(OutputPin, 255); 
-// Serial.print("Senal sensor: ");
-// Serial.print(PV);
-// Serial.print(" - set point: ");
-// Serial.print(setp);
-// Serial.print("- Senal control: ");
-// Serial.println(CP);
 }

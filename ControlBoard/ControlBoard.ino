@@ -38,43 +38,6 @@ myTransfer.begin(Serial);
 
 }
 
-void loop() {
-
-
-comunicationIN();
-if (uart_on_off != "0")
-  {
-   PID();
-   //FSerial.print("se ejecuto el PID");
-  } else {
-    CP=0;
-    }
-comunicationOUT();
-
-
-}
-
-void comunicationIN(){
-  char uartinmsg[50];
-
-  if(myTransfer.available())
-  {
-    uint16_t recSize = 0;   
-    recSize = myTransfer.rxObj(uartinmsg, recSize);    
-  }
-
-  if(strlen(uartinmsg)>1){
-    
-    sscanf(uartinmsg,"%f;%f;%f;%f",&setp,&Kp,&Ti,&Td);
-
-    } else {
-    uart_on_off=uartinmsg;      
-    }
-    
-    
-}
-
-
 struct Data {
   double SetP;
   double PV;
@@ -85,6 +48,31 @@ struct Data {
   long long TD;
   char* ON_OFF;
 } send_params;
+
+void loop() {
+  comunicationIN();
+  
+  if (uart_on_off != "0"){
+     PID();
+     //FSerial.print("se ejecuto el PID");
+  } else {
+    CP=0;
+  }
+  
+  comunicationOUT();
+}
+
+void comunicationIN(){
+    myTransfer.rxObj(send_params);
+
+    setp = send_params.SetP;
+    PV = send_params.PV;
+    CP = send_params.CP;
+    Kp = send_params.KP;
+    Ti = send_params.TI;
+    Td = send_params.TD;
+    uart_on_off = send_params.ON_OFF;  
+}
 
 void comunicationOUT(){
   long long now = 0; // time in seconds 

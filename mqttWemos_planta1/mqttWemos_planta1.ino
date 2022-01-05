@@ -29,7 +29,20 @@ float CP=0.00;
 
 
 
+struct Data {
+  double SetP;
+  double PV;
+  double CP;
+  long long Time;
+} send_data;
 
+struct Params {
+  double SetP;
+  double KP;
+  double TI;
+  long long TD;
+  char* ON_OFF;
+} send_params;
 
 
 
@@ -89,19 +102,20 @@ void uart_receive_data(){
   if(!uart_transfer.available())
     return;
 
-  uint16_t sizeData = 0;
-
-  sizeData = uart_transfer.rxObj(data, sizeData);
-  
+  uart_transfer.rxObj(send_data);
+  Serial.println("DATA: ");
+  Serial.println(send_data.SetP);
+  Serial.println(send_data.PV);
 }
 
 void uart_receive_params(){
   if(!uart_transfer.available())
     return;
 
-  uint16_t sizeData = 0;
-
-  sizeData = uart_transfer.rxObj(params, sizeData);
+  uart_transfer.rxObj(send_params);
+  Serial.println("PARAMS: ");
+  Serial.println(send_data.SetP);
+  Serial.println(send_data.KP);
 }
 
 void uart_send_params(){

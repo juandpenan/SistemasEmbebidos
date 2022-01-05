@@ -42,7 +42,7 @@ void loop() {
 
 
 comunicationIN();
-if (uart_on_off != '0')
+if (uart_on_off != "0")
   {
    PID();
    //FSerial.print("se ejecuto el PID");
@@ -74,21 +74,50 @@ void comunicationIN(){
     
 }
 
+
+struct Data {
+  double SetP;
+  double PV;
+  double CP;
+  long long Time;
+} send_data;
+
+struct Params {
+  double SetP;
+  double KP;
+  double TI;
+  long long TD;
+  char* ON_OFF;
+} send_params;
+
 void comunicationOUT(){
-  unsigned long now = 0; // time in seconds 
+  long long now = 0; // time in seconds 
   uint16_t sendSize = 0;
   uint16_t sendSize1 = 0;
   now = millis() / 1000.0;
+
+  send_data.SetP = setp;
+  send_data.PV = PV;
+  send_data.CP = CP;
+  send_data.Time = now;
+
+  send_params.SetP = setp;
+  send_params.KP = Kp;
+  send_params.TI = Ti;
+  send_params.TD = Td;
+  send_params.ON_OFF = uart_on_off;
+  
 //  snprintf(bufferdata,50,"%f;%f;%f;%f",setp,PV,CP,now);
-sprintf(bufferdata,"%d;%d;%d;%ld",(int)setp,(int)PV,(int)CP,(long long)now);
+//sprintf(bufferdata,"%d;%d;%d;%ld",(int)setp,(int)PV,(int)CP,(long long)now);
 // CAMBIA A PARAMETROS
-  snprintf(bufferparameters,50,"%d;%d;%d;%d;%d",(int)setp,(int)Kp,(int)Ti,(int)Td,(int)uart_on_off);
-  sendSize = myTransfer.txObj(bufferdata, sendSize);
-  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
-  myTransfer.sendData(sendSize);
-  myTransfer.sendData(sendSize1);
-  Serial.print("SENDING: ");
-  Serial.println(bufferdata);
+//  snprintf(bufferparameters,50,"%d;%d;%d;%d;%d",(int)setp,(int)Kp,(int)Ti,(int)Td,(int)uart_on_off);
+//  sendSize = myTransfer.txObj(bufferdata, sendSize);
+//  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
+
+  myTransfer.sendDatum(send_data);
+  myTransfer.sendDatum(send_params);
+//  Serial.print("SENDING: ");
+//  Serial.println(send_data);
 
 }
 

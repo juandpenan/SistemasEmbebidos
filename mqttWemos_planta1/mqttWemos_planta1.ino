@@ -4,9 +4,9 @@
 #include "SerialTransfer.h"
 
 //MQTT COMMUNICATION PARAMETERS
-const char* ssid = "WIFI_4C";
-const char* password = "chontaduroexternocleidomastoideo";
-const char* mqtt_server = "192.168.1.64";
+const char* ssid = "udcdocencia";
+const char* password = "Universidade.2022";
+const char* mqtt_server = "10.20.30.242";
 
 // UART COMMUNICATION
 SerialTransfer uart_transfer;
@@ -81,7 +81,7 @@ void loop() {
 void uart_send_on_off(){
   uint16_t sizeData = 0;
   sizeData =  uart_transfer.txObj(mqtt_in_onoff, sizeData);
-  uart_transfer.sendData(sizeData);
+//  uart_transfer.sendData(sizeData);
 }
 
 
@@ -107,7 +107,7 @@ void uart_receive_params(){
 void uart_send_params(){
   uint16_t sizeData = 0;
   sizeData =  uart_transfer.txObj(params, sizeData);
-  uart_transfer.sendData(sizeData);
+//  uart_transfer.sendData(sizeData);
 }
 
 void mqtt_send_data(){
@@ -158,7 +158,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
   Serial.print("Message arrived [");
   Serial.print(topic);
-  Serial.print("] ");
+  Serial.println("] ");
   
   if (topic == "plant1/on_off"){
     for (int i = 0; i < length; i++) {
@@ -166,7 +166,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     inmsg[length] = '\0';
     mqtt_in_onoff = inmsg == "1";
-    mqtt_in_onoff = true;
+    //mqtt_in_onoff = true;
     
   } else if (topic == "plant1/get_parameters"){
       

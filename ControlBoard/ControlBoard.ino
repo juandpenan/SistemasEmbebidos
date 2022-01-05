@@ -5,11 +5,11 @@
 #include <string.h>
 //......................DEFINITIONS...................................//
 #define InputPin A0 // Level input (0-10V) 
-#define OutputPin 10 // Pump´s angular velocity output (0-10V) 
+#define OutputPin 3 // Pump´s angular velocity output (0-10V) 
 //...................... VARIABLES....................................//
 SerialTransfer myTransfer;
 double PV=0;   // Process value 
-double setp=10;   // Set point
+double setp=30;   // Set point
 double ERR=0;  // Error
 double CP=0;   // Control process
 int Ts=1000;   // Sample time 1s
@@ -45,6 +45,7 @@ comunicationIN();
 if (uart_on_off != '0')
   {
    PID();
+   //FSerial.print("se ejecuto el PID");
   } else {
     CP=0;
     }
@@ -74,23 +75,37 @@ void comunicationIN(){
 }
 
 void comunicationOUT(){
-unsigned long now = 0; // time in seconds 
-uint16_t sendSize = 0;
-uint16_t sendSize1 = 0;
-now = millis() * 1000.0;
-snprintf(bufferdata,50,"%f;%f;%f;%f",setp,PV,CP,now);
-snprintf(bufferparameters,50,"%f;%f;%f;%f",setp,PV,CP,now);
-sendSize = myTransfer.txObj(bufferdata, sendSize);
-sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
-myTransfer.sendData(sendSize);
-myTransfer.sendData(sendSize1);
+  unsigned long now = 0; // time in seconds 
+  uint16_t sendSize = 0;
+  uint16_t sendSize1 = 0;
+  now = millis() / 1000.0;
+//  snprintf(bufferdata,50,"%f;%f;%f;%f",setp,PV,CP,now);
+sprintf(bufferdata,"%d;%d;%d;%ld",(int)setp,(int)PV,(int)CP,(long long)now);
+// CAMBIA A PARAMETROS
+  snprintf(bufferparameters,50,"%d;%d;%d;%d;%d",(int)setp,(int)Kp,(int)Ti,(int)Td,(int)uart_on_off);
+  sendSize = myTransfer.txObj(bufferdata, sendSize);
+  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
+  myTransfer.sendData(sendSize);
+  myTransfer.sendData(sendSize1);
+  Serial.print("SENDING: ");
+  Serial.println(bufferdata);
 
 }
 
 void PID() {
  myPID.SetSampleTime(Ts);
  myPID.SetTunings(Kp,Ti,Td);
- PV= analogRead(InputPin);
+ double tmp =analogRead(InputPin);
+ PV= (tmp*(100/1023.0));
  myPID.Compute();
- analogWrite(OutputPin,CP); 
+// Serial.print("- Senal control: ");
+// Serial.println(CP);
+ analogWrite(OutputPin,CP);
+// analogWrite(OutputPin, 255); 
+// Serial.print("Senal sensor: ");
+// Serial.print(PV);
+// Serial.print(" - set point: ");
+// Serial.print(setp);
+// Serial.print("- Senal control: ");
+// Serial.println(CP);
 }

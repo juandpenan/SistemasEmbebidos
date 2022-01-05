@@ -3,24 +3,24 @@
 #include <PubSubClient.h>
 #include "SerialTransfer.h"
 
+
 //MQTT COMMUNICATION PARAMETERS
-const char* ssid = "udcdocencia";
-const char* password = "Universidade.2022";
-const char* mqtt_server = "10.20.30.242";
+const char* ssid = "WIFI_4C";//"udcdocencia"
+const char* password = "chontaduroexternocleidomastoideo"; //Universidade.2022
+const char* mqtt_server = "192.168.1.64";
 
 // UART COMMUNICATION
 SerialTransfer uart_transfer;
 
 // VARIABLES
-//WiFiClient espClient;
-//PubSubClient client(espClient);
+WiFiClient espClient;
+PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
 bool mqtt_in_onoff=true;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
-char data[20];
 char params[20];
 int value = 0;
 
@@ -31,10 +31,10 @@ struct Data {
   double SetP;
   double PV;
   double CP;
-  long long Time;
+  int Time;
   double KP;
   double TI;
-  long long TD;
+  double TD;
   char* ON_OFF;
 } send_data;
 
@@ -68,17 +68,19 @@ void loop() {
      8. MQTT: RECEIVE new parameters
      9: UART: SEND new parameters
   */
-
+  //Serial.print(mqtt_in_onoff);
   if(!mqtt_in_onoff)
     return;
     
-  uart_send_data();
+  uart_send_params();
   uart_receive_data();
 
   mqtt_send_data();
 
   if(mqtt_in_getparams)
     mqtt_send_params();
+
+    delay(1000);
 }
 
 void uart_send_on_off(){
@@ -89,9 +91,15 @@ void uart_send_on_off(){
 
 
 void uart_receive_data(){
-  if(!uart_transfer.available())
-    return;
-  uart_transfer.rxObj(send_data);
+  if(uart_transfer.available()){
+    uart_transfer.rxObj(send_data);
+    Serial.print(send_data.Time);
+    Serial.print("<-Time / Setpoint->");
+    Serial.println(send_data.SetP);
+    }
+      
+      
+      
 }
 
 void uart_send_params(){
@@ -103,22 +111,23 @@ void mqtt_send_data(){
   char data[50];
 
   sprintf(data, "%f;%f;%f;%ld", send_data.SetP, send_data.PV, send_data.CP, send_data.Time);
+  //sprintf(data, "%f;%f;%f;%ld", 20.5, 22.5, 100.0, send_data.Time);
   
-  Serial.print("Publish message: ");
-  Serial.println(data);
+  //Serial.print("Publish message: ");
+  //Serial.println(data);
   
   client.publish("plant1/data", data);
 }
 
 void mqtt_send_params(){
-  char data[50];
+  char data1[50];
 
-  sprintf(data, "%f;%f;%f;%f;%s", send_data.SetP, send_data.KP, send_data.TI, send_data.TD, send_data.ON_OFF);
+  sprintf(data1, "%f;%f;%f;%f;%s", send_data.SetP, send_data.KP, send_data.TI, send_data.TD, send_data.ON_OFF);
   
-  Serial.print("Publish message: ");
-  Serial.println(data);
-  
-  client.publish("plant1/parameters", data);
+//  Serial.print("Publish message: ");
+//  Serial.println(data);
+//  
+//  client.publish("plant1/parameters", data);
 }
 
 

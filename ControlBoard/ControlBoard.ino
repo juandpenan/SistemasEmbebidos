@@ -34,15 +34,15 @@ myPID.SetMode(AUTOMATIC);
 Serial.begin(115200);
 myTransfer.begin(Serial);
 
-
-
 }
+
+int now = 0;
 
 struct Data {
   double SetP;
   double PV;
   double CP;
-  long long Time;
+  int Time;
   double KP;
   double TI;
   double TD;
@@ -60,6 +60,9 @@ void loop() {
   }
   
   comunicationOUT();
+
+  delay(1000);
+  now++;
 }
 
 void comunicationIN(){
@@ -77,11 +80,9 @@ void comunicationIN(){
     }  
 }
 
-void comunicationOUT(){
-  long long now = 0; // time in seconds 
+void comunicationOUT(){ 
   uint16_t sendSize = 0;
   uint16_t sendSize1 = 0;
-  now = millis() / 1000;
 
   send_params.SetP = setp;
   send_params.PV = PV;

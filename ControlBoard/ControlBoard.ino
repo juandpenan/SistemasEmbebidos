@@ -81,7 +81,7 @@ void comunicationOUT(){
   long long now = 0; // time in seconds 
   uint16_t sendSize = 0;
   uint16_t sendSize1 = 0;
-  now = (long long) millis() / 1000L;
+  now = millis() / 1000;
 
   send_params.SetP = setp;
   send_params.PV = PV;

@@ -75,6 +75,7 @@ void comunicationIN(){
 }
 
 void comunicationOUT(){
+
   unsigned long now = 0; // time in seconds 
   uint16_t sendSize = 0;
   uint16_t sendSize1 = 0;
@@ -84,11 +85,14 @@ sprintf(bufferdata,"%d;%d;%d;%ld",(int)setp,(int)PV,(int)CP,(long long)now);
 // CAMBIA A PARAMETROS
   snprintf(bufferparameters,50,"%d;%d;%d;%d;%d",(int)setp,(int)Kp,(int)Ti,(int)Td,(int)uart_on_off);
   sendSize = myTransfer.txObj(bufferdata, sendSize);
-  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
+  Serial.print("data: ");
   myTransfer.sendData(sendSize);
+  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
+  Serial.print("- parameters: ");
   myTransfer.sendData(sendSize1);
-  Serial.print("SENDING: ");
-  Serial.println(bufferdata);
+  Serial.println();
+ // Serial.print("SENDING: ");
+ // Serial.println(bufferdata);
 
 }
 

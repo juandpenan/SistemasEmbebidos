@@ -80,10 +80,6 @@ struct Data {
   double PV;
   double CP;
   long long Time;
-} send_data;
-
-struct Params {
-  double SetP;
   double KP;
   double TI;
   long long TD;
@@ -96,12 +92,10 @@ void comunicationOUT(){
   uint16_t sendSize1 = 0;
   now = millis() / 1000.0;
 
-  send_data.SetP = setp;
-  send_data.PV = PV;
-  send_data.CP = CP;
-  send_data.Time = now;
-
   send_params.SetP = setp;
+  send_params.PV = PV;
+  send_params.CP = CP;
+  send_params.Time = now;
   send_params.KP = Kp;
   send_params.TI = Ti;
   send_params.TD = Td;
@@ -114,7 +108,6 @@ void comunicationOUT(){
 //  sendSize = myTransfer.txObj(bufferdata, sendSize);
 //  sendSize1 = myTransfer.txObj(bufferparameters, sendSize1);
 
-  myTransfer.sendDatum(send_data);
   myTransfer.sendDatum(send_params);
 //  Serial.print("SENDING: ");
 //  Serial.println(send_data);
@@ -125,7 +118,7 @@ void PID() {
  myPID.SetSampleTime(Ts);
  myPID.SetTunings(Kp,Ti,Td);
  double tmp =analogRead(InputPin);
- PV= (tmp*(100/1023.0));
+// PV= (tmp*(100/1023.0));
  myPID.Compute();
 // Serial.print("- Senal control: ");
 // Serial.println(CP);

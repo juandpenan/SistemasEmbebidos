@@ -78,7 +78,7 @@ void comunicationIN(){
       Td = send_params.TD;
       uart_on_off = send_params.ON_OFF;
       Serial.print("recibiendo: ");
-      Serial.print(setp);
+      Serial.println(setp);
     }  
     
 }

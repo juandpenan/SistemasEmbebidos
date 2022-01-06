@@ -103,10 +103,9 @@ void uart_receive_data(){
 }
 
 void uart_send_params(){
-  uint16_t sizeData = 0;
   uart_transfer.sendDatum(send_data);
   Serial.print("Enviando");
-  Serial.print(send_data.ON_OFF);
+  Serial.println(send_data.ON_OFF);
 }
 
 void mqtt_send_data(){

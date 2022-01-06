@@ -72,8 +72,8 @@ void comunicationIN(){
 
       char buffer_data[100];
 
-      Serial.readBytes(buffer_data, 100);
-      sscanf(buffer_data, "%f;%f;%f;%f;%f;%f;%s", &setp, &PV, &CP, &Kp, &Ti, &Td, &uart_on_off);
+//      Serial.readBytes(buffer_data, 100);
+//      sscanf(buffer_data, "%f;%f;%f;%f;%f;%f;%s", &setp, &PV, &CP, &Kp, &Ti, &Td, &uart_on_off);
       setp=Serial.parseFloat();
       //PV=Serial.parseFloat();
       //CP=Serial.parseFloat();
@@ -99,7 +99,7 @@ void comunicationOUT(){
 
 //  myTransfer.sendDatum(send_params);
 
-  char buffer_data[100];
+//  char buffer_data[100];
 //  sprintf(buffer_data, "%f;%f;%f;%f;%f;%f;%d", setp, PV, CP, Kp, Ti, Td, now);
 //  Serial.print("SENDING: ");
 //  Serial.println(buffer_data);

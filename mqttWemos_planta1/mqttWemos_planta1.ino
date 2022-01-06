@@ -21,8 +21,16 @@ char msg[MSG_BUFFER_SIZE];
 bool mqtt_in_onoff=true;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
-char params[20];
+char params[100];
 int value = 0;
+double setp =0;
+double Kp =0;
+double Ti =0;
+double Td =0;
+double Cp=0;
+double Pv=0;
+int Time=0;
+char* on_off;
 
 
 
@@ -93,19 +101,25 @@ void uart_send_on_off(){
 
 void uart_receive_data(){
   
-  if(uart_transfer.available()){
-    uart_transfer.rxObj(send_data);
-    Serial.print(send_data.Time);
-    Serial.print("<-Time / Setpoint->");
-    Serial.println(send_data.SetP);
+  if(Serial.available()){
+    char inmsg[100];
+   Serial.readBytes(inmsg,100);
+   scanf(inmsg,"%f;%f;%f;%f;%f;%f;%d",&setp,&Pv,&Cp,&Kp,&Ti,&Td,&Time);
+
+//   Serial.print(" setp ");
+//   Serial.print(setp);
+//   Serial.print(" cp ");
+//   Serial.print(Cp);
+//   Serial.print(" Time ");
+//   Serial.println(Time);
   }
       
 }
 
 void uart_send_params(){
-  uart_transfer.sendDatum(send_data);
-  Serial.print("Enviando");
-  Serial.println(send_data.ON_OFF);
+  sprintf(params,"%f;%f;%f;%f;%f;%f;%s",setp,Kp,Ti,Td,on_off);
+  Serial.write(params);
+  Serial.flush();
 }
 
 void mqtt_send_data(){

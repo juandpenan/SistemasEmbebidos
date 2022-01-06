@@ -103,8 +103,8 @@ void uart_receive_data(){
   
   if(Serial.available()){
     char inmsg[100];
-   Serial.readBytes(inmsg,100);
-   scanf(inmsg,"%f;%f;%f;%f;%f;%f;%d",&setp,&Pv,&Cp,&Kp,&Ti,&Td,&Time);
+    Serial.readBytes(inmsg,100);
+    scanf(inmsg,"%f;%f;%f;%f;%f;%f;%d",&setp,&Pv,&Cp,&Kp,&Ti,&Td,&Time);
 
 //   Serial.print(" setp ");
 //   Serial.print(setp);
@@ -117,9 +117,9 @@ void uart_receive_data(){
 }
 
 void uart_send_params(){
-  sprintf(params,"%f;%f;%f;%f;%f;%f;%s",setp,Kp,Ti,Td,on_off);
-  Serial.write(params);
-  Serial.flush();
+  char buffer_data[100];
+  sprintf(buffer_data,"%f;%f;%f;%f;%f;%f;%s",setp,Pv,Cp,Kp,Ti,Td,on_off);
+  Serial.write(buffer_data);
 }
 
 void mqtt_send_data(){

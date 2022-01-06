@@ -51,11 +51,11 @@ void setup() {
 
 void loop() {
 
-  if (!client.connected()) {
-    reconnect();
-  }
-  
-  client.loop();
+//  if (!client.connected()) {
+//    reconnect();
+//  }
+//  
+//  client.loop();
 
   /*
      1. MQTT: RECEIVE on/off from app
@@ -69,16 +69,16 @@ void loop() {
      9: UART: SEND new parameters
   */
   //Serial.print(mqtt_in_onoff);
-  if(!mqtt_in_onoff)
-    return;
+//  if(!mqtt_in_onoff)
+//    return;
     
   uart_send_params();
   uart_receive_data();
 
-  mqtt_send_data();
+//  mqtt_send_data();
 
-  if(mqtt_in_getparams)
-    mqtt_send_params();
+//  if(mqtt_in_getparams)
+//    mqtt_send_params();
 
     delay(1000);
 }
@@ -91,14 +91,13 @@ void uart_send_on_off(){
 
 
 void uart_receive_data(){
+  
   if(uart_transfer.available()){
     uart_transfer.rxObj(send_data);
     Serial.print(send_data.Time);
     Serial.print("<-Time / Setpoint->");
     Serial.println(send_data.SetP);
-    }
-      
-      
+  }
       
 }
 

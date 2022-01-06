@@ -20,7 +20,7 @@ char bufferparameters[50];
 char bufferdata[50]; 
 float times=0;
 
-char* uart_on_off;
+char uart_on_off;
 
 
 //...................... PID ..........................................//
@@ -52,7 +52,7 @@ int now = 0;
 void loop() {
   comunicationIN();
   
-  if (uart_on_off != "0"){
+  if (uart_on_off != '0'){
      PID();
      //FSerial.print("se ejecuto el PID");
   } else {
@@ -103,14 +103,14 @@ void comunicationOUT(){
 //  sprintf(buffer_data, "%f;%f;%f;%f;%f;%f;%d", setp, PV, CP, Kp, Ti, Td, now);
 //  Serial.print("SENDING: ");
 //  Serial.println(buffer_data);
-   Serial.write(setp);
-   Serial.write(PV);
-   Serial.write(CP);
-   Serial.write(Kp);
-   Serial.write(Ti);
-   Serial.write(Td);
-   Serial.write(now);
-   asd
+   Serial.println(setp);
+   Serial.println(PV);
+   Serial.println(CP);
+   Serial.println(Kp);
+   Serial.println(Ti);
+   Serial.println(Td);
+   Serial.println(now);
+   
    
 
 }

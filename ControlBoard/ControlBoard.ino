@@ -20,7 +20,7 @@ char bufferparameters[50];
 char bufferdata[50]; 
 float times=0;
 
-char uart_on_off;
+char uart_on_off='1';
 
 
 //...................... PID ..........................................//
@@ -75,8 +75,8 @@ void comunicationIN(){
       Serial.readBytes(buffer_data, 100);
       sscanf(buffer_data, "%f;%f;%f;%f;%f;%f;%s", &setp, &PV, &CP, &Kp, &Ti, &Td, &uart_on_off);
       setp=Serial.parseFloat();
-      PV=Serial.parseFloat();
-      CP=Serial.parseFloat();
+      //PV=Serial.parseFloat();
+      //CP=Serial.parseFloat();
       Kp=Serial.parseFloat();
       Ti=Serial.parseFloat();
       Td=Serial.parseFloat();
@@ -103,12 +103,12 @@ void comunicationOUT(){
 //  sprintf(buffer_data, "%f;%f;%f;%f;%f;%f;%d", setp, PV, CP, Kp, Ti, Td, now);
 //  Serial.print("SENDING: ");
 //  Serial.println(buffer_data);
-   Serial.println(setp);
+   //Serial.println(setp);
    Serial.println(PV);
    Serial.println(CP);
-   Serial.println(Kp);
-   Serial.println(Ti);
-   Serial.println(Td);
+//   Serial.println(Kp);
+//   Serial.println(Ti);
+//   Serial.println(Td);
    Serial.println(now);
    
    

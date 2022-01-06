@@ -1,7 +1,6 @@
  //.......................LIBRARIES....................................//
 #include <PID_v1.h>         // PID´s library
 #include <stdio.h>          // C++ library for snprintf
-#include "SerialTransfer.h" // Serial communication library
 #include <string.h>
 //......................DEFINITIONS...................................//
 #define InputPin A0 // Level input (0-10V) 
@@ -19,7 +18,6 @@ double Td=1.02;   // Derivative constant
 char bufferparameters[50]; 
 char bufferdata[50]; 
 float times=0;
-
 char uart_on_off='1';
 
 
@@ -32,33 +30,20 @@ void setup() {
 myPID.SetMode(AUTOMATIC);
 // Communication settings
 Serial.begin(115200);
-myTransfer.begin(Serial);
 
 }
 
 int now = 0;
 
-//struct Data {
-//  double SetP;
-//  double PV;
-//  double CP;
-//  int Time;
-//  double KP;
-//  double TI;
-//  double TD;
-//  char* ON_OFF;
-//} send_params;
 
 void loop() {
   comunicationIN();
   
   if (uart_on_off != '0'){
      PID();
-     //FSerial.print("se ejecuto el PID");
-  } else {
+    } else {
     CP=0;
-  }
-  
+  }  
   comunicationOUT();
 
   delay(1000);
@@ -69,49 +54,19 @@ void comunicationIN(){
 
     
     if(Serial.available()){
-
-      char buffer_data[100];
-
-//      Serial.readBytes(buffer_data, 100);
-//      sscanf(buffer_data, "%f;%f;%f;%f;%f;%f;%s", &setp, &PV, &CP, &Kp, &Ti, &Td, &uart_on_off);
       setp=Serial.parseFloat();
-      //PV=Serial.parseFloat();
-      //CP=Serial.parseFloat();
       Kp=Serial.parseFloat();
       Ti=Serial.parseFloat();
       Td=Serial.parseFloat();
       uart_on_off=Serial.read();
-//      Serial.print("recibiendo: ");
-//      Serial.println(buffer_data);
     }  
     
 }
 
 void comunicationOUT(){ 
-//  send_params.SetP = setp;
-//  send_params.PV = PV;
-//  send_params.CP = CP;
-//  send_params.Time = now;
-//  send_params.KP = Kp;
-//  send_params.TI = Ti;
-//  send_params.TD = Td;
-//  send_params.ON_OFF = uart_on_off;
-
-//  myTransfer.sendDatum(send_params);
-
-//  char buffer_data[100];
-//  sprintf(buffer_data, "%f;%f;%f;%f;%f;%f;%d", setp, PV, CP, Kp, Ti, Td, now);
-//  Serial.print("SENDING: ");
-//  Serial.println(buffer_data);
-   //Serial.println(setp);
    Serial.println(PV);
    Serial.println(CP);
-//   Serial.println(Kp);
-//   Serial.println(Ti);
-//   Serial.println(Td);
-   Serial.println(now);
-   
-   
+   Serial.println(now);  
 
 }
 

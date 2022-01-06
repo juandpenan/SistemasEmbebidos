@@ -30,7 +30,7 @@ double Td =0;
 double Cp=0;
 double Pv=0;
 int Time=0;
-char* on_off;
+char on_off='1';
 
 
 
@@ -102,15 +102,13 @@ void uart_send_on_off(){
 void uart_receive_data(){
   
   if(Serial.available()){
-    char inmsg[100];
-    Serial.readBytes(inmsg,100);
 //    scanf(inmsg,"%f;%f;%f;%f;%f;%f;%d",&setp,&Pv,&Cp,&Kp,&Ti,&Td,&Time);
-    setp = Serial.parseFloat();
+//    setp = Serial.parseFloat();
     Pv = Serial.parseFloat();
     Cp = Serial.parseFloat();
-    Kp = Serial.parseFloat();
-    Ti = Serial.parseFloat();
-    Td = Serial.parseFloat();
+//    Kp = Serial.parseFloat();
+//    Ti = Serial.parseFloat();
+//    Td = Serial.parseFloat();
     Time = Serial.parseInt();
   }
       
@@ -120,8 +118,8 @@ void uart_send_params(){
 //  char buffer_data[100];
 //  sprintf(buffer_data,"%f;%f;%f;%f;%f;%f;%s",setp,Pv,Cp,Kp,Ti,Td,on_off);
   Serial.println(setp);
-  Serial.println(Pv);
-  Serial.println(Cp);
+//  Serial.println(Pv);
+//  Serial.println(Cp);
   Serial.println(Kp);
   Serial.println(Ti);
   Serial.println(Td);

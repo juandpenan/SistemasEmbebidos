@@ -1,5 +1,5 @@
 // LIBRARIES 
-#include <ESP8266WiFi.h>
+//#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include "SerialTransfer.h"
 
@@ -13,8 +13,8 @@ const char* mqtt_server = "192.168.1.64";
 SerialTransfer uart_transfer;
 
 // VARIABLES
-WiFiClient espClient;
-PubSubClient client(espClient);
+//WiFiClient espClient;
+//PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
@@ -72,8 +72,9 @@ void loop() {
 //  if(!mqtt_in_onoff)
 //    return;
     
-  uart_send_params();
+ 
   uart_receive_data();
+  uart_send_params();
 
 //  mqtt_send_data();
 
@@ -104,6 +105,8 @@ void uart_receive_data(){
 void uart_send_params(){
   uint16_t sizeData = 0;
   uart_transfer.sendDatum(send_data);
+  Serial.print("Enviando");
+  Serial.print(send_data.ON_OFF);
 }
 
 void mqtt_send_data(){
@@ -115,7 +118,7 @@ void mqtt_send_data(){
   //Serial.print("Publish message: ");
   //Serial.println(data);
   
-  client.publish("plant1/data", data);
+  //client.publish("plant1/data", data);
 }
 
 void mqtt_send_params(){
@@ -141,28 +144,28 @@ void parse_parameters(char* msg){
 
 
 
-void setup_wifi() {
-
-  delay(10);
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  randomSeed(micros());
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-
-  
-}
+//void setup_wifi() {
+//
+//  delay(10);
+//  Serial.println();
+//  Serial.print("Connecting to ");
+//  Serial.println(ssid);
+//
+//  WiFi.mode(WIFI_STA);
+//  WiFi.begin(ssid, password);
+//
+//  while (WiFi.status() != WL_CONNECTED) {
+//    delay(500);
+//    Serial.print(".");
+//  }
+//
+//  randomSeed(micros());
+//
+//  Serial.println("");
+//  Serial.println("WiFi connected");
+//
+//  
+//}
 
 
 
@@ -208,25 +211,25 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 
 
-void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Create a random client ID
-    String clientId = "ESP8266Client-";
-    clientId += String(random(0xffff), HEX);
-    // Attempt to connect
-    if (client.connect(clientId.c_str())) {
-      Serial.println("connected");
-      client.subscribe("plant1/on_off");
-      client.subscribe("plant1/get_parameters");
-      client.subscribe("plant1/update_parameters");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
-  }
-}
+//void reconnect() {
+//  // Loop until we're reconnected
+//  //while (!client.connected()) {
+//    Serial.print("Attempting MQTT connection...");
+//    // Create a random client ID
+//    String clientId = "ESP8266Client-";
+//    clientId += String(random(0xffff), HEX);
+//    // Attempt to connect
+//    if (client.connect(clientId.c_str())) {
+//      Serial.println("connected");
+//      client.subscribe("plant1/on_off");
+//      client.subscribe("plant1/get_parameters");
+//      client.subscribe("plant1/update_parameters");
+//    } else {
+//      Serial.print("failed, rc=");
+//      Serial.print(client.state());
+//      Serial.println(" try again in 5 seconds");
+//      // Wait 5 seconds before retrying
+//      delay(5000);
+//    }
+//  }
+//}

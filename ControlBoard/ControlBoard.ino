@@ -67,7 +67,7 @@ void loop() {
 
 void comunicationIN(){
 
-//    if(myTransfer.available()){
+    if(myTransfer.available()){
       myTransfer.rxObj(send_params);
   
       setp = send_params.SetP;
@@ -77,7 +77,10 @@ void comunicationIN(){
       Ti = send_params.TI;
       Td = send_params.TD;
       uart_on_off = send_params.ON_OFF;
-//    }  
+      Serial.print("recibiendo: ");
+      Serial.print(setp);
+    }  
+    
 }
 
 void comunicationOUT(){ 

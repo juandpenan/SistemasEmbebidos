@@ -38,16 +38,16 @@ myTransfer.begin(Serial);
 
 int now = 0;
 
-struct Data {
-  double SetP;
-  double PV;
-  double CP;
-  int Time;
-  double KP;
-  double TI;
-  double TD;
-  char* ON_OFF;
-} send_params;
+//struct Data {
+//  double SetP;
+//  double PV;
+//  double CP;
+//  int Time;
+//  double KP;
+//  double TI;
+//  double TD;
+//  char* ON_OFF;
+//} send_params;
 
 void loop() {
   comunicationIN();
@@ -67,38 +67,36 @@ void loop() {
 
 void comunicationIN(){
 
-    if(myTransfer.available()){
-      myTransfer.rxObj(send_params);
-  
-      setp = send_params.SetP;
-      PV = send_params.PV;
-      CP = send_params.CP;
-      Kp = send_params.KP;
-      Ti = send_params.TI;
-      Td = send_params.TD;
-      uart_on_off = send_params.ON_OFF;
-      Serial.print("recibiendo: ");
-      Serial.println(setp);
+    
+    if(Serial.available()){
+
+      char buffer_data[100];
+
+      Serial.readBytes(buffer_data, 100);
+      sscanf(buffer_data, "%f;%f;%f;%f;%f;%f;%s", &setp, &PV, &CP, &Kp, &Ti, &Td, &uart_on_off);
+//      Serial.print("recibiendo: ");
+//      Serial.println(buffer_data);
     }  
     
 }
 
 void comunicationOUT(){ 
-  uint16_t sendSize = 0;
-  uint16_t sendSize1 = 0;
+//  send_params.SetP = setp;
+//  send_params.PV = PV;
+//  send_params.CP = CP;
+//  send_params.Time = now;
+//  send_params.KP = Kp;
+//  send_params.TI = Ti;
+//  send_params.TD = Td;
+//  send_params.ON_OFF = uart_on_off;
 
-  send_params.SetP = setp;
-  send_params.PV = PV;
-  send_params.CP = CP;
-  send_params.Time = now;
-  send_params.KP = Kp;
-  send_params.TI = Ti;
-  send_params.TD = Td;
-  send_params.ON_OFF = uart_on_off;
+//  myTransfer.sendDatum(send_params);
 
-  myTransfer.sendDatum(send_params);
-  Serial.print("SENDING: ");
-  Serial.println((int)send_params.Time);
+  char buffer_data[100];
+  sprintf(buffer_data, "%f;%f;%f;%f;%f;%f;%d", setp, PV, CP, Kp, Ti, Td, now);
+//  Serial.print("SENDING: ");
+//  Serial.println(buffer_data);
+   Serial.write(buffer_data);
 
 }
 

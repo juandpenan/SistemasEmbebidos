@@ -17,7 +17,7 @@ PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
-bool mqtt_in_onoff=true;
+bool mqtt_in_onoff=false;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[100];
@@ -163,29 +163,44 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(topic);
   Serial.println("] ");
   
-  if (topic == "plant1/on_off"){
+  if (String(topic) == "plant1/on_off"){
+    //Serial.print("Se ejecuto la condicion del topic on_off");
+
     for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
     }
     inmsg[length] = '\0';
-    mqtt_in_onoff = inmsg == "1";
+    mqtt_in_onoff = String(inmsg) == "1";
+    //Serial.print(mqtt_in_onoff);
    
     
-  } else if (topic == "plant1/get_parameters"){
-      
+  } else if (String(topic) == "plant1/get_parameters"){
+      //Serial.print("Se ejecuto la condicion del topic get params");
       for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
       }
       inmsg[length]='\0';
-      mqtt_in_getparams = inmsg == "";
+      mqtt_in_getparams = String(inmsg) == "";
+//      Serial.println(inmsg);
+//      if (mqtt_in_getparams){
+//        Serial.print("recibi un espacio vacio");
+//        }
       
-  } else if (topic == "plant1/update_parameters") {
-        
+  } else if (String(topic) == "plant1/update_parameters") {
+      
+      //Serial.print("Se ejecuto la condicion del topic update params");  
       for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
       }
       inmsg[length]='\0';
-      sscanf(inmsg,"%f;%f;%f;%f",&setp,&Kp,&Ti,&Td);
+      Serial.print(inmsg);
+      ssncanf(inmsg,50,"%f;%f;%f;%f",&setp,&Kp,&Ti,&Td);
+      Serial.print("setp: ");
+      Serial.print(setp);
+//      Serial.print(" Kp: ");
+//      Serial.print(Kp);
+//      Serial.print(" Td: ");
+//      Serial.print(Td);
   }
   
 //  for (int i = 0; i < length; i++) {

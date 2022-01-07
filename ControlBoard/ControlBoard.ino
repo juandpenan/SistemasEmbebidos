@@ -6,7 +6,7 @@
 #define InputPin A0 // Level input (0-10V) 
 #define OutputPin 3 // Pump´s angular velocity output (0-10V) 
 //...................... VARIABLES....................................//
-SerialTransfer myTransfer;
+
 double PV=0;   // Process value 
 double setp=30;   // Set point
 double ERR=0;  // Error

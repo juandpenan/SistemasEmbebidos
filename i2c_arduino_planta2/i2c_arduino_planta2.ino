@@ -8,18 +8,18 @@
 #define OutputPin 3 // Pump´s angular velocity output (0-10V) 
 //...................... VARIABLES....................................//
 
-double PV=0;   // Process value 
-double setp=30;   // Set point
-double ERR=0;  // Error
-double CP=0;   // Control process
-int Ts=1000;   // Sample time 1s
-double Kp=1;   // Proportional constant
-double Ti=8.14;   // Integrative constant
-double Td=1.02;   // Derivative constant
+volatile double PV=0;   // Process value 
+volatile double setp=30;   // Set point
+volatile double ERR=0;  // Error
+volatile double CP=0;   // Control process
+volatile int Ts=1000;   // Sample time 1s
+volatile double Kp=1;   // Proportional constant
+volatile double Ti=8.14;   // Integrative constant
+volatile double Td=1.02;   // Derivative constant
 char bufferparameters[50]; 
 char bufferdata[50]; 
-float times=0;
-char i2c_on_off='1';
+volatile float times=0;
+volatile char i2c_on_off='1';
 
 
 //...................... PID ..........................................//
@@ -61,24 +61,43 @@ void loop() {
   now = ElapsedTime /1000;
 }
 
-void comunicationIN(int bytes){
 
-    
-    if(Serial.available()){
-      setp=Serial.parseFloat();
-      Kp=Serial.parseFloat();
-      Ti=Serial.parseFloat();
-      Td=Serial.parseFloat();
-      i2c_on_off=Serial.read();
-    }  
-    
+void comunicationIN(int bytes){
+  int msg_size = 4*sizeof(double) + 1;
+
+  byte* receiver;
+
+  for(i=0; i<msg_size; i++)
+    *(receiver + i) = (byte)Wire.read();
+
+  setp=(double) *receiver;
+  Serial.print("setp: ");
+  Serial.println(setp);
+  
+  Kp=(double) *(receiver + sizeof(double));
+  Serial.print("Kp: ");
+  Serial.println(Kp);
+  
+  Ti=(double) *(receiver + 2*sizeof(double));
+  Serial.print("Ti: ");
+  Serial.println(Ti);
+  
+  Td=(double) *(receiver + 3*sizeof(double));
+  Serial.print("Td: ");
+  Serial.println(Td);
+  
+  i2c_on_off=(char) *(receiver + 3*sizeof(double) + 1);
+  Serial.print("i2c_on_off: ");
+  Serial.println(i2c_on_off);
+  
 }
 
-void comunicationOUT(){ 
-   Serial.println(PV);
-   Serial.println(CP);
-   Serial.println(now);  
 
+void comunicationOUT(){ 
+
+   Wire.write((byte*)&PV, sizeof(PV));
+   Wire.write((byte*)&CP, sizeof(CP));
+   Wire.write((byte*)&now, sizeof(now));
 }
 
 void PID() {

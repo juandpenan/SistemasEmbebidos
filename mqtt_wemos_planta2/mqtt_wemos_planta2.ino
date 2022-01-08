@@ -23,14 +23,14 @@ bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[100];
 int value = 0;
-double setp =30;
-double Kp =1;
-double Ti =8.14;
-double Td =1.02;
-double Cp;
-double Pv;
-int Time;
-char on_off;
+volatile double setp =30;
+volatile double Kp =1;
+volatile double Ti =8.14;
+volatile double Td =1.02;
+volatile double Cp;
+volatile double Pv;
+volatile int Time;
+volatile char on_off;
 
 
 
@@ -100,26 +100,36 @@ void loop() {
 
 void i2c_receive_data(){
   
- Wire.requestFrom(8,sizeof)
-  if(Serial.available()){
-
-    Pv = Serial.parseFloat();
-    Cp = Serial.parseFloat();
-    Time = Serial.parseInt();
+  Wire.requestFrom(2,2*sizeof(double) + sizeof(int))
+  byte* data;
+  int index = 0;
+  while(Wire.available()){
+    *(data + index) = (byte)Wire.read();
+    index++;
   }
+
+  PV=(double) *(data + sizeof(double));
+  Serial.print("PV: ");
+  Serial.println(PV);
+  
+  CP=(double) *(data + 2*sizeof(double));
+  Serial.print("CP: ");
+  Serial.println(CP);
+  
+  Time=(int) *(data + 2*sizeof(double)+sizeof(int));
+  Serial.print("Time: ");
+  Serial.println(Time);
       
 }
 
 void i2c_send_params(){
-  
- Wire.beginTransmission(8);
- Wire.endTransmission();
-
-  Serial.println(setp);
-  Serial.println(Kp);
-  Serial.println(Ti);
-  Serial.println(Td);
-  Serial.println(on_off);
+  Wire.beginTransmission(2);
+  Wire.write((byte*)&PV, sizeof(setp));
+  Wire.write((byte*)&CP, sizeof(Kp));
+  Wire.write((byte*)&now, sizeof(Ti));
+  Wire.write((byte*)&CP, sizeof(Td));
+  Wire.write((byte*)&now, sizeof(on_off));
+  Wire.endTransmission();
 }
 
 void mqtt_send_data(){

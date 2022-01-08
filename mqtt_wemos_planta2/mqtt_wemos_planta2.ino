@@ -100,11 +100,13 @@ void loop() {
 
 
 void i2c_receive_data(){
-  
-  Wire.requestFrom(2,2*sizeof(double) + sizeof(int));
-  byte* data;
+
+  int msg_size = 2*sizeof(double) + sizeof(int);
+  Wire.requestFrom(2,msg_size);
+  byte data[msg_size];
   int index = 0;
   bool received=false;
+  
   while(Wire.available()){
     Serial.println("Comienza  a leer");
     *(data + index) = (byte)Wire.read();
@@ -114,16 +116,17 @@ void i2c_receive_data(){
   }
 
   if (!received)
-  return;
-  Pv=(double) *(data + sizeof(double));
+    return;
+  
+  Pv=*((double*)&data[0]);
   Serial.print("PV: ");
   Serial.println(Pv);
   
-  Cp=(double) *(data + 2*sizeof(double));
+  Cp=*((double*)&data[sizeof(double)]);
   Serial.print("CP: ");
   Serial.println(Cp);
   
-  Time=(int) *(data + 2*sizeof(double)+sizeof(int));
+  Time=*((int*)&data[2*sizeof(double)]);
   Serial.print("Time: ");
   Serial.println(Time);
       

@@ -65,28 +65,29 @@ void loop() {
 void comunicationIN(int bytes){
   int msg_size = 4*sizeof(double) + 1;
 
-  byte* receiver;
-  int i; 
+  byte receiver[msg_size];
+
+  int i;
   for(i=0; i<msg_size; i++)
     *(receiver + i) = (byte)Wire.read();
 
-  setp=(double) *receiver;
+  setp=*((double*)&receiver);
   Serial.print("setp: ");
   Serial.println(setp);
   
-  Kp=(double) *(receiver + sizeof(double));
+  Kp=*((double*)&receiver[sizeof(double)]);
   Serial.print("Kp: ");
   Serial.println(Kp);
   
-  Ti=(double) *(receiver + 2*sizeof(double));
+  Ti=*((double*)&receiver[2*sizeof(double)]);
   Serial.print("Ti: ");
   Serial.println(Ti);
   
-  Td=(double) *(receiver + 3*sizeof(double));
+  Td=*((double*)&receiver[3*sizeof(double)]);
   Serial.print("Td: ");
   Serial.println(Td);
   
-  i2c_on_off=(char) *(receiver + 3*sizeof(double) + 1);
+  i2c_on_off=*((char*)&receiver[3*sizeof(double) + 1]);
   Serial.print("i2c_on_off: ");
   Serial.println(i2c_on_off);
   

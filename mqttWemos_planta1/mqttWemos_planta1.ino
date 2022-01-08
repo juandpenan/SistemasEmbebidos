@@ -17,7 +17,7 @@ PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
-bool mqtt_in_onoff=false;
+bool mqtt_in_onoff;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[100];
@@ -67,10 +67,17 @@ void loop() {
       uart_send_params();
       uart_receive_data();
       mqtt_send_data();
+      
+      
       if(mqtt_in_getparams){
-       mqtt_send_params();} 
+       mqtt_send_params();
+       mqtt_in_getparams=false;
+       }
+       
+        
     
     }
+    
 //  Serial.print(mqtt_in_onoff);
   
 //  if(!mqtt_in_onoff)
@@ -121,7 +128,7 @@ void mqtt_send_data(){
 void mqtt_send_params(){
   char data1[50];
 
-  sprintf(data1, "%f;%f;%f;%f;%s", setp,Kp,Ti,Td,on_off);
+  sprintf(data1, "%f;%f;%f;%f;%c", setp,Kp,Ti,Td,on_off);
   Serial.print("Publish message: ");
   Serial.println(data1);
   client.publish("plant1/parameters", data1);
@@ -170,6 +177,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
         inmsg[i] = (char)payload[i];
     }
     inmsg[length] = '\0';
+    on_off=inmsg[0];
     mqtt_in_onoff = String(inmsg) == "1";
     //Serial.print(mqtt_in_onoff);
    
@@ -180,27 +188,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
         inmsg[i] = (char)payload[i];
       }
       inmsg[length]='\0';
-      mqtt_in_getparams = String(inmsg) == "";
-//      Serial.println(inmsg);
-//      if (mqtt_in_getparams){
-//        Serial.print("recibi un espacio vacio");
-//        }
+      mqtt_in_getparams = String(inmsg) == " ";
+
+     
       
   } else if (String(topic) == "plant1/update_parameters") {
+    float inc_setp,inc_kp,inc_ti,inc_td;
       
       //Serial.print("Se ejecuto la condicion del topic update params");  
       for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
       }
       inmsg[length]='\0';
-      Serial.print(inmsg);
-      ssncanf(inmsg,50,"%f;%f;%f;%f",&setp,&Kp,&Ti,&Td);
-      Serial.print("setp: ");
-      Serial.print(setp);
-//      Serial.print(" Kp: ");
-//      Serial.print(Kp);
-//      Serial.print(" Td: ");
-//      Serial.print(Td);
+      //Serial.print(inmsg);
+      sscanf(inmsg,"%f;%f;%f;%f",&inc_setp,&inc_kp,&inc_ti,&inc_td);
+           
+      setp=inc_setp;
+      Kp=inc_kp;
+      Ti=inc_ti;
+      Td=inc_td;
+      
   }
   
 //  for (int i = 0; i < length; i++) {

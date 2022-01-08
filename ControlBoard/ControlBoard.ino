@@ -37,6 +37,12 @@ int now = 0;
 
 
 void loop() {
+  unsigned long StartTime = millis();
+
+
+
+
+
   comunicationIN();
   
   if (uart_on_off != '0'){
@@ -47,7 +53,9 @@ void loop() {
   comunicationOUT();
 
   delay(1000);
-  now++;
+  unsigned long CurrentTime = millis();
+  unsigned long ElapsedTime = CurrentTime - StartTime;
+  now = ElapsedTime /1000;
 }
 
 void comunicationIN(){
@@ -77,4 +85,5 @@ void PID() {
  PV= (tmp*(100/1023.0));
  myPID.Compute();
  analogWrite(OutputPin,CP);
+ CP=CP* (100.0/250.0);
 }

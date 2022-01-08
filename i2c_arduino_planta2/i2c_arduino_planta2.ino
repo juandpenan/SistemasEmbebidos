@@ -66,7 +66,7 @@ void comunicationIN(int bytes){
   int msg_size = 4*sizeof(double) + 1;
 
   byte* receiver;
-
+  int i; 
   for(i=0; i<msg_size; i++)
     *(receiver + i) = (byte)Wire.read();
 

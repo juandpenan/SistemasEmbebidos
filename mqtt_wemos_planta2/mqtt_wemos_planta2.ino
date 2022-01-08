@@ -23,14 +23,14 @@ bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[100];
 int value = 0;
-volatile double setp =30;
-volatile double Kp =1;
-volatile double Ti =8.14;
-volatile double Td =1.02;
-volatile double Cp;
-volatile double Pv;
-volatile int Time;
-volatile char on_off;
+double setp =30;
+double Kp =1;
+double Ti =8.14;
+double Td =1.02;
+double Cp;
+double Pv;
+int Time;
+char on_off;
 
 
 
@@ -39,19 +39,19 @@ volatile char on_off;
 void setup() {
   
   Serial.begin(115200);
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  //setup_wifi();
+  //client.setServer(mqtt_server, 1883);
+  //client.setCallback(callback);
   Wire.begin();
 }
 
 void loop() {
 
-  if (!client.connected()) {
-    reconnect();
-  }
-  
-  client.loop();
+//  if (!client.connected()) {
+//    reconnect();
+//  }
+//  
+//  client.loop();
 
   /*
      1. MQTT: RECEIVE on/off from app
@@ -65,20 +65,21 @@ void loop() {
      9: i2c: SEND new parameters
   */
 
-  if (mqtt_in_onoff){
-      i2c_send_params();
-      i2c_receive_data();
-      mqtt_send_data();
-      
-      
-      if(mqtt_in_getparams){
-       mqtt_send_params();
-       mqtt_in_getparams=false;
-       }
+//  if (mqtt_in_onoff){
+//      i2c_send_params();
+//      i2c_receive_data();
+//      mqtt_send_data();
+//      
+//      
+//      if(mqtt_in_getparams){
+//       mqtt_send_params();
+//       mqtt_in_getparams=false;
+//       }
        
-        
+    i2c_send_params();
+    i2c_receive_data();    
     
-    }
+    
     
 //  Serial.print(mqtt_in_onoff);
   
@@ -100,21 +101,27 @@ void loop() {
 
 void i2c_receive_data(){
   
-  Wire.requestFrom(2,2*sizeof(double) + sizeof(int))
+  Wire.requestFrom(2,2*sizeof(double) + sizeof(int));
   byte* data;
   int index = 0;
+  bool received=false;
   while(Wire.available()){
+    Serial.println("Comienza  a leer");
     *(data + index) = (byte)Wire.read();
     index++;
+    Serial.println(index);
+    received=true;
   }
 
-  PV=(double) *(data + sizeof(double));
+  if (!received)
+  return;
+  Pv=(double) *(data + sizeof(double));
   Serial.print("PV: ");
-  Serial.println(PV);
+  Serial.println(Pv);
   
-  CP=(double) *(data + 2*sizeof(double));
+  Cp=(double) *(data + 2*sizeof(double));
   Serial.print("CP: ");
-  Serial.println(CP);
+  Serial.println(Cp);
   
   Time=(int) *(data + 2*sizeof(double)+sizeof(int));
   Serial.print("Time: ");
@@ -124,12 +131,17 @@ void i2c_receive_data(){
 
 void i2c_send_params(){
   Wire.beginTransmission(2);
-  Wire.write((byte*)&PV, sizeof(setp));
-  Wire.write((byte*)&CP, sizeof(Kp));
-  Wire.write((byte*)&now, sizeof(Ti));
-  Wire.write((byte*)&CP, sizeof(Td));
-  Wire.write((byte*)&now, sizeof(on_off));
+  Wire.write((byte*)&setp, sizeof(setp));
   Wire.endTransmission();
+  Wire.write((byte*)&Kp, sizeof(Kp));
+  Wire.endTransmission();
+  Wire.write((byte*)&Ti, sizeof(Ti));
+  Wire.endTransmission();
+  Wire.write((byte*)&Td, sizeof(Td));
+  Wire.endTransmission();
+  Wire.write((byte*)&on_off, sizeof(on_off));
+  Wire.endTransmission();
+  Serial.println("Se enviaron los datos");
 }
 
 void mqtt_send_data(){

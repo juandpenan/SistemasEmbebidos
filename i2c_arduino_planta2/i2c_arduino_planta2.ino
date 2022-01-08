@@ -1,0 +1,92 @@
+ //.......................LIBRARIES....................................//
+#include <PID_v1.h>         // PID´s library
+#include <stdio.h>          // C++ library for snprintf
+#include <string.h>
+#include "Wire.h"
+//......................DEFINITIONS...................................//
+#define InputPin A0 // Level input (0-10V) 
+#define OutputPin 3 // Pump´s angular velocity output (0-10V) 
+//...................... VARIABLES....................................//
+
+double PV=0;   // Process value 
+double setp=30;   // Set point
+double ERR=0;  // Error
+double CP=0;   // Control process
+int Ts=1000;   // Sample time 1s
+double Kp=1;   // Proportional constant
+double Ti=8.14;   // Integrative constant
+double Td=1.02;   // Derivative constant
+char bufferparameters[50]; 
+char bufferdata[50]; 
+float times=0;
+char i2c_on_off='1';
+
+
+//...................... PID ..........................................//
+
+PID myPID(&PV, &CP, &setp, Kp, Ti, Td, DIRECT);
+
+void setup() {
+  // PID settings
+  myPID.SetMode(AUTOMATIC);
+  // Communication settings
+  Serial.begin(115200);
+  Wire.begin(2);
+  Wire.onReceive(comunicationIN);
+  Wire.onRequest(comunicationOUT);
+}
+
+int now = 0;
+
+
+void loop() {
+  unsigned long StartTime = millis();
+
+
+
+
+
+ 
+  
+  if (i2c_on_off != '0'){
+     PID();
+    } else {
+    CP=0;
+  }  
+  
+
+  delay(1000);
+  unsigned long CurrentTime = millis();
+  unsigned long ElapsedTime = CurrentTime - StartTime;
+  now = ElapsedTime /1000;
+}
+
+void comunicationIN(int bytes){
+
+    
+    if(Serial.available()){
+      setp=Serial.parseFloat();
+      Kp=Serial.parseFloat();
+      Ti=Serial.parseFloat();
+      Td=Serial.parseFloat();
+      i2c_on_off=Serial.read();
+    }  
+    
+}
+
+void comunicationOUT(){ 
+   Serial.println(PV);
+   Serial.println(CP);
+   Serial.println(now);  
+
+}
+
+void PID() {
+ myPID.SetSampleTime(Ts);
+ myPID.SetTunings(Kp,Ti,Td);
+ double tmp =analogRead(InputPin);
+ PV= (tmp*(100/1023.0));
+ myPID.Compute();
+ analogWrite(OutputPin,CP);
+ CP=CP* (100.0/250.0);
+}

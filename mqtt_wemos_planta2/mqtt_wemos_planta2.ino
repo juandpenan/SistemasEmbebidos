@@ -21,16 +21,17 @@ char msg[MSG_BUFFER_SIZE];
 bool mqtt_in_onoff;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
-char params[100];
+char params[50];
+char data[50];
 int value = 0;
-double setp =30;
+double setp =80;
 double Kp =1;
 double Ti =8.14;
 double Td =1.02;
 double Cp;
 double Pv;
 int Time;
-char on_off;
+char on_off='0';
 
 
 
@@ -81,70 +82,40 @@ void loop() {
     
     
     
-//  Serial.print(mqtt_in_onoff);
-  
-//  if(!mqtt_in_onoff)
-//    return;
-    
- 
-//  i2c_receive_data();
-//  i2c_send_params();
-
-//  mqtt_send_data();
-
-//  if(mqtt_in_getparams)
-//    mqtt_send_params();
 
     delay(1000);
 }
 
 
 void i2c_receive_data(){
-
-  int msg_size = 2*sizeof(double) + sizeof(int);
-  Wire.requestFrom(2,msg_size);
-  byte data[msg_size];
-  int index = 0;
-  bool received=false;
-  
-  while(Wire.available()){
-    Serial.println("Comienza  a leer");
-    *(data + index) = (byte)Wire.read();
-    index++;
-    Serial.println(index);
-    received=true;
+  Wire.requestFrom(2,15);
+  int i=0; //counter for each bite as it arrives
+  while (Wire.available()) { 
+    data[i] = Wire.read(); // every character that arrives it put in order in the empty array "t"
+    i=i+1;
   }
-
-  if (!received)
-    return;
+  float Pv_int,Cp_int;
+  sscanf(data,"%f;%f;%d",&Pv_int,&Cp_int,&Time);
+  Pv=Pv_int;
+  Cp=Cp_int;
+ 
   
-  Pv=*((double*)&data[0]);
-  Serial.print("PV: ");
-  Serial.println(Pv);
-  
-  Cp=*((double*)&data[sizeof(double)]);
-  Serial.print("CP: ");
-  Serial.println(Cp);
-  
-  Time=*((int*)&data[2*sizeof(double)]);
-  Serial.print("Time: ");
-  Serial.println(Time);
-      
 }
 
 void i2c_send_params(){
-  Wire.beginTransmission(2);
-  Wire.write((byte*)&setp, sizeof(setp));
-  Wire.endTransmission();
-  Wire.write((byte*)&Kp, sizeof(Kp));
-  Wire.endTransmission();
-  Wire.write((byte*)&Ti, sizeof(Ti));
-  Wire.endTransmission();
-  Wire.write((byte*)&Td, sizeof(Td));
-  Wire.endTransmission();
-  Wire.write((byte*)&on_off, sizeof(on_off));
-  Wire.endTransmission();
-  Serial.println("Se enviaron los datos");
+  char str_setp[6];
+  char str_Kp[6];
+  char str_Ti[6];
+  char str_Td[6];
+ dtostrf(setp,3,2,str_setp);
+ dtostrf(Kp,3,2,str_Kp);
+ dtostrf(Ti,3,2,str_Ti);
+ dtostrf(Td,3,2,str_Td);
+ sprintf(params,"%s;%s;%s;%s;%c",str_setp,str_Kp,str_Ti,str_Td,on_off);
+ Wire.beginTransmission(2);
+ Wire.write(params);
+ Wire.endTransmission();
+  
 }
 
 void mqtt_send_data(){

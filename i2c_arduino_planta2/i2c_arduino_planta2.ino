@@ -3,6 +3,7 @@
 #include <stdio.h>          // C++ library for snprintf
 #include <string.h>
 #include "Wire.h"
+
 //......................DEFINITIONS...................................//
 #define InputPin A0 // Level input (0-10V) 
 #define OutputPin 3 // Pump´s angular velocity output (0-10V) 
@@ -69,28 +70,54 @@ void Parseinfo(){
  dtostrf(PV,3,2,str_PV);
  dtostrf(CP,3,2,str_CP);
  sprintf(bufferdata,"%s;%s;%d",str_PV,str_CP,now);
- int setp_int;
- float kp_int,ti_int,td_int;
- char on_off;
- char setpoint[6];
- char s_setp[6];
- char *s_kp;
- int index;
- String s_bufferparameters; 
- for(int i =0;i < sizeof(bufferparameters); i++){
+ 
+ String s_setp,s_kp,s_ti,s_td,s_on_off;
+ String s_bufferparameters = String(bufferparameters);
+ char* tempbuffer;
+ Serial.print("Info completa: ");
+ Serial.println(bufferparameters);
+ s_setp= strtok(bufferparameters,";");
+ s_bufferparameters.remove(0,s_setp.length()+1);
+ s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
+ s_kp= strtok(tempbuffer,";");
+ s_bufferparameters.remove(0,s_kp.length()+1);
+ s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
+ s_ti= strtok(tempbuffer,";");
+ s_bufferparameters.remove(0,s_ti.length()+1);
+ s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
+ s_td= strtok(tempbuffer,";");
+ s_bufferparameters.remove(0,s_td.length()+1);
+ s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
+ s_on_off= strtok(tempbuffer,";");
+ 
+ Serial.print("Info completa: ");
+ Serial.println(bufferparameters);
+// Serial.print(" Kp: ");
+// Serial.print(s_kp);
+// Serial.print(" Td: ");
+// Serial.print(s_td);
+// Serial.print(" on_off: ");
+// Serial.println(s_on_off);
   
-  if(bufferparameters[i] != ";"){
-    s_setp[i]=bufferparameters[i];
-    
-    }
-  }
-  Serial.println(s_setp);
+// for(int i =0;i < sizeof(bufferparameters); i++){
+//  
+//  if(bufferparameters[i] != ";"){
+//    s_setp[i]=bufferparameters[i];
+//    
+//    }
+//  }
+//  Serial.println(s_setp);
   
 // s_setp = strtok(bufferparameters, ";");
 // 
 // s_bufferparameters=String(bufferparameters).remove(0,s_setp.length());
 // Serial.println(s_bufferparameters);
-// sscanf(bufferparameters,"%s;%f;%f;%f;%c",setpoint,&kp_int,&ti_int,&td_int,&on_off);
+ //sscanf(bufferparameters,"%s;%f;%f;%f;%d",s_setp,&kp_int,&ti_int,&td_int,&on_off);
+// setp_int=scanf(bufferparameters,"%f;");
+// Serial.print("Info llegada : " );
+// Serial.print(bufferparameters);
+// Serial.print(" setp : " );
+// Serial.println(setp_int);
 // //setp=setp_int;
 // setp=String(bufferparameters).toDouble();
 // Kp=String(bufferparameters[sizeof(setp)]).toDouble();

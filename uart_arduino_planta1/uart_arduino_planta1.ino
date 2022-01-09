@@ -2,11 +2,12 @@
 #include <PID_v1.h>         // PID´s library
 #include <stdio.h>          // C++ library for snprintf
 #include <string.h>
+
 //......................DEFINITIONS...................................//
 #define InputPin A0 // Level input (0-10V) 
 #define OutputPin 3 // Pump´s angular velocity output (0-10V) 
-//...................... VARIABLES....................................//
 
+//...................... VARIABLES....................................//
 double PV=0;   // Process value 
 double setp=30;   // Set point
 double ERR=0;  // Error
@@ -22,26 +23,22 @@ char uart_on_off='1';
 
 
 //...................... PID ..........................................//
-
 PID myPID(&PV, &CP, &setp, Kp, Ti, Td, DIRECT);
 
-void setup() {
-// PID settings
-myPID.SetMode(AUTOMATIC);
-// Communication settings
-Serial.begin(115200);
 
+void setup() {
+  // PID settings
+  myPID.SetMode(AUTOMATIC);
+  // Communication settings
+  Serial.begin(115200);
 }
 
 int now = 0;
 
 
 void loop() {
+
   unsigned long StartTime = millis();
-
-
-
-
 
   comunicationIN();
   
@@ -50,16 +47,18 @@ void loop() {
     } else {
     CP=0;
   }  
+  
   comunicationOUT();
 
   delay(1000);
+  
   unsigned long CurrentTime = millis();
   unsigned long ElapsedTime = CurrentTime - StartTime;
+  
   now = ElapsedTime /1000;
 }
 
 void comunicationIN(){
-
     
     if(Serial.available()){
       setp=Serial.parseFloat();
@@ -79,11 +78,16 @@ void comunicationOUT(){
 }
 
 void PID() {
- myPID.SetSampleTime(Ts);
- myPID.SetTunings(Kp,Ti,Td);
- double tmp =analogRead(InputPin);
- PV= (tmp*(100/1023.0));
- myPID.Compute();
- analogWrite(OutputPin,CP);
- CP=CP* (100.0/250.0);
+  
+  myPID.SetSampleTime(Ts);
+  myPID.SetTunings(Kp,Ti,Td);
+  
+  double tmp =analogRead(InputPin);
+  
+  PV= (tmp*(100/1023.0));
+  
+  myPID.Compute();
+  
+  analogWrite(OutputPin,CP);
+  CP=CP* (100.0/250.0);
 }

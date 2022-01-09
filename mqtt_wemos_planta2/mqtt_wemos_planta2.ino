@@ -6,17 +6,18 @@
 
 
 //MQTT COMMUNICATION PARAMETERS
+#define MSG_BUFFER_SIZE  50
+
 const char* ssid = "WIFI_4C";//"udcdocencia"
 const char* password = "chontaduroexternocleidomastoideo"; //Universidade.2022
 const char* mqtt_server = "192.168.1.64";
 
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 
 // VARIABLES
-WiFiClient espClient;
-PubSubClient client(espClient);
 unsigned long lastMsg = 0;
-#define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
 bool mqtt_in_onoff;
 bool mqtt_in_getparams;
@@ -31,9 +32,6 @@ double Cp;
 double Pv;
 int Time;
 char on_off;
-
-
-
 
 
 void setup() {
@@ -53,68 +51,58 @@ void loop() {
   
   client.loop();
 
-  /*
-     1. MQTT: RECEIVE on/off from app
-     2. i2c: SEND on/off
-     3. i2c: RECEIVE data
-     4. i2c: RECEIVE parameters
-     5. MQTT: SEND data
-     6. MQTT: RECEIVE parameter request
-     7. MQTT: SEND parameters (if requested)
-     8. MQTT: RECEIVE new parameters
-     9: i2c: SEND new parameters
-  */
-
   if (mqtt_in_onoff){
-      i2c_send_params();
-      i2c_receive_data();
-      mqtt_send_data();
+    i2c_send_params();
+    i2c_receive_data();
+    mqtt_send_data();
       
       
-      if(mqtt_in_getparams){
+    if(mqtt_in_getparams){
        mqtt_send_params();
        mqtt_in_getparams=false;
-       }
+    }
   }
        
-       
-    
-    
-    
-
-    delay(1000);
+  delay(1000);
 }
 
 
 
 void i2c_receive_data(){
+  
   Wire.requestFrom(2,15);
+  
   int i=0; //counter for each bite as it arrives
+  
   while (Wire.available()) { 
     data[i] = Wire.read(); // every character that arrives it put in order in the empty array "t"
     i=i+1;
   }
+  
   float Pv_int,Cp_int;
   sscanf(data,"%f;%f;%d",&Pv_int,&Cp_int,&Time);
   Pv=Pv_int;
   Cp=Cp_int;
- 
   
 }
 
 void i2c_send_params(){
+  
   char str_setp[6];
   char str_Kp[6];
   char str_Ti[6];
   char str_Td[6];
- dtostrf(setp,3,2,str_setp);
- dtostrf(Kp,3,2,str_Kp);
- dtostrf(Ti,3,2,str_Ti);
- dtostrf(Td,3,2,str_Td);
- sprintf(params,"%s;%s;%s;%s;%c",str_setp,str_Kp,str_Ti,str_Td,on_off);
- Wire.beginTransmission(2);
- Wire.write(params);
- Wire.endTransmission();
+  
+  dtostrf(setp,3,2,str_setp);
+  dtostrf(Kp,3,2,str_Kp);
+  dtostrf(Ti,3,2,str_Ti);
+  dtostrf(Td,3,2,str_Td);
+  
+  sprintf(params,"%s;%s;%s;%s;%c",str_setp,str_Kp,str_Ti,str_Td,on_off);
+  
+  Wire.beginTransmission(2);
+  Wire.write(params);
+  Wire.endTransmission();
   
 }
 
@@ -157,8 +145,6 @@ void setup_wifi() {
 
   Serial.println("");
   Serial.println("WiFi connected");
-
-  
 }
 
 

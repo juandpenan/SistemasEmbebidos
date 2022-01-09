@@ -22,6 +22,7 @@ char bufferparameters[50];
 char bufferdata[50]; 
 
 String i2c_on_off;
+volatile int now = 0;
 
 
 //...................... PID ..........................................//
@@ -38,12 +39,12 @@ void setup() {
   Wire.onRequest(comunicationOUT);
 }
 
-volatile int now = 0;
+
 
 
 void loop() {
  
-  unsigned long StartTime = millis();
+  unsigned long StartTime = millis();     
 
   Parseinfo();
  
@@ -109,10 +110,10 @@ void Parseinfo(){
 
 void comunicationIN(int bytes){
   
-  int i=0; //counter for each bite as it arrives
+  int i=0; 
   
   while (Wire.available()) { 
-    bufferparameters[i] = Wire.read(); // every character that arrives it put in order in the empty array "t"
+    bufferparameters[i] = Wire.read(); 
     i=i+1;
   }
 }

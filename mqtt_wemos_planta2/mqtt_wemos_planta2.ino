@@ -23,7 +23,6 @@ bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[50];
 char data[50];
-int value = 0;
 double setp =80;
 double Kp =1;
 double Ti =8.14;
@@ -31,7 +30,7 @@ double Td =1.02;
 double Cp;
 double Pv;
 int Time;
-char on_off='0';
+char on_off;
 
 
 
@@ -40,19 +39,19 @@ char on_off='0';
 void setup() {
   
   Serial.begin(115200);
-  //setup_wifi();
-  //client.setServer(mqtt_server, 1883);
-  //client.setCallback(callback);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
   Wire.begin();
 }
 
 void loop() {
 
-//  if (!client.connected()) {
-//    reconnect();
-//  }
-//  
-//  client.loop();
+  if (!client.connected()) {
+    reconnect();
+  }
+  
+  client.loop();
 
   /*
      1. MQTT: RECEIVE on/off from app
@@ -66,25 +65,26 @@ void loop() {
      9: i2c: SEND new parameters
   */
 
-//  if (mqtt_in_onoff){
-//      i2c_send_params();
-//      i2c_receive_data();
-//      mqtt_send_data();
-//      
-//      
-//      if(mqtt_in_getparams){
-//       mqtt_send_params();
-//       mqtt_in_getparams=false;
-//       }
+  if (mqtt_in_onoff){
+      i2c_send_params();
+      i2c_receive_data();
+      mqtt_send_data();
+      
+      
+      if(mqtt_in_getparams){
+       mqtt_send_params();
+       mqtt_in_getparams=false;
+       }
+  }
        
-    i2c_send_params();
-    i2c_receive_data();    
+       
     
     
     
 
     delay(1000);
 }
+
 
 
 void i2c_receive_data(){
@@ -212,10 +212,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
       
   }
   
-//  for (int i = 0; i < length; i++) {
-//    Serial.print((char)payload[i]);
-//  }
-//  Serial.println();
 }
 
 

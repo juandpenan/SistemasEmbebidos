@@ -19,7 +19,7 @@ double Ti=8.14;   // Integrative constant
 double Td=1.02;   // Derivative constant
 char bufferparameters[50]; 
 char bufferdata[50]; 
-char i2c_on_off='1';
+String i2c_on_off;
 
 
 //...................... PID ..........................................//
@@ -49,9 +49,9 @@ void loop() {
 
 
  
-  
-  if (i2c_on_off != '0'){
-     PID();
+  Serial.println(i2c_on_off);
+  if (i2c_on_off == "1" ){
+      PID();
     } else {
     CP=0;
   }  
@@ -74,8 +74,7 @@ void Parseinfo(){
  String s_setp,s_kp,s_ti,s_td,s_on_off;
  String s_bufferparameters = String(bufferparameters);
  char* tempbuffer;
- Serial.print("Info completa: ");
- Serial.println(bufferparameters);
+
  s_setp= strtok(bufferparameters,";");
  s_bufferparameters.remove(0,s_setp.length()+1);
  s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
@@ -90,46 +89,16 @@ void Parseinfo(){
  s_bufferparameters.toCharArray(tempbuffer,s_bufferparameters.length());
  s_on_off= strtok(tempbuffer,";");
  
- Serial.print("Info completa: ");
- Serial.println(bufferparameters);
-// Serial.print(" Kp: ");
-// Serial.print(s_kp);
-// Serial.print(" Td: ");
-// Serial.print(s_td);
-// Serial.print(" on_off: ");
-// Serial.println(s_on_off);
-  
-// for(int i =0;i < sizeof(bufferparameters); i++){
-//  
-//  if(bufferparameters[i] != ";"){
-//    s_setp[i]=bufferparameters[i];
-//    
-//    }
-//  }
-//  Serial.println(s_setp);
-  
-// s_setp = strtok(bufferparameters, ";");
-// 
-// s_bufferparameters=String(bufferparameters).remove(0,s_setp.length());
-// Serial.println(s_bufferparameters);
- //sscanf(bufferparameters,"%s;%f;%f;%f;%d",s_setp,&kp_int,&ti_int,&td_int,&on_off);
-// setp_int=scanf(bufferparameters,"%f;");
-// Serial.print("Info llegada : " );
-// Serial.print(bufferparameters);
-// Serial.print(" setp : " );
-// Serial.println(setp_int);
-// //setp=setp_int;
-// setp=String(bufferparameters).toDouble();
-// Kp=String(bufferparameters[sizeof(setp)]).toDouble();
-// //Kp=kp_int;
-// Ti=ti_int;
-// Td=td_int;
-// Serial.print("Info recibida: ");
-// Serial.print(String(bufferparameters));
-// Serial.print("Setpoint recibido: ");
-// Serial.print(setp);
-// Serial.print(" Kp ");
-// Serial.println(Kp);
+ setp=s_setp.toDouble();
+ Kp=s_kp.toDouble();
+ Ti=s_ti.toDouble();
+ Td=s_td.toDouble();
+ i2c_on_off=s_on_off;
+ 
+
+
+ 
+ 
 
  
  }
@@ -147,43 +116,13 @@ int i=0; //counter for each bite as it arrives
 
 
   
-//  int msg_size = 4*sizeof(double) + 1;
-//
-//  byte receiver[msg_size];
-//
-//  int i;
-//  for(i=0; i<msg_size; i++)
-//    *(receiver + i) = (byte)Wire.read();
-//
-//  setp=*((double*)&receiver);
-//  Serial.print("setp: ");
-//  Serial.println(setp);
-//  
-//  Kp=*((double*)&receiver[sizeof(double)]);
-//  Serial.print("Kp: ");
-//  Serial.println(Kp);
-//  
-//  Ti=*((double*)&receiver[2*sizeof(double)]);
-//  Serial.print("Ti: ");
-//  Serial.println(Ti);
-//  
-//  Td=*((double*)&receiver[3*sizeof(double)]);
-//  Serial.print("Td: ");
-//  Serial.println(Td);
-//  
-//  i2c_on_off=*((char*)&receiver[3*sizeof(double) + 1]);
-//  Serial.print("i2c_on_off: ");
-//  Serial.println(i2c_on_off);
+
   
 }
 
 
 void comunicationOUT(){ 
 
-//   Wire.write((byte*)&PV, sizeof(PV));
-//   Wire.write((byte*)&CP, sizeof(CP));
-//   Wire.write((byte*)&now, sizeof(now));
-//   Serial.println("Datos enviados");
   Wire.write(bufferdata);
 }
 

@@ -79,17 +79,9 @@ void Parseinfo(){
   
   dtostrf(PV,3,2,str_PV);
   dtostrf(CP,3,2,str_CP);
-//  Serial.print("String pV: ");
-//  Serial.print(str_PV);
-//  Serial.print(" PV: ");
-//  Serial.print(PV);
-//  Serial.print("String CP: ");
-//  Serial.print(str_CP);
-//  Serial.print(" CP: ");
-//  Serial.print(CP);
+
   sprintf(bufferdata,"%s;%s;%d",str_PV,str_CP,now);
-//  Serial.print(" bufferdata : ");
-//  Serial.println(bufferdata);
+
   
   String s_setp,s_kp,s_ti,s_td,s_on_off;
   
@@ -146,19 +138,10 @@ void PID() {
   
   myPID.SetSampleTime(Ts);
   myPID.SetTunings(Kp,Ti,Td);
-//  Serial.print("Parameters KP, Ti, Td :");
-//  Serial.print(Kp);
-//  Serial.print(",");
-//  Serial.print(Ti);
-//  Serial.print(",");
-//  Serial.println(Td);  
+  
   double tmp =analogRead(InputPin);
   
   PV= (tmp*(100/1023.0));
-//  Serial.print("PV and SETP ");
-//  Serial.print(PV);
-//  Serial.print(" ; ");
-//  Serial.print(setp);
   
   myPID.Compute();
 

@@ -5,8 +5,6 @@
 
 
 
-//MQTT COMMUNICATION PARAMETERS
-#define MSG_BUFFER_SIZE  50
 
 const char* ssid = "udcdocencia"; // "WIFI_4C";//
 const char* password = "Universidade.2022"; // "chontaduroexternocleidomastoideo"; //
@@ -18,7 +16,6 @@ PubSubClient client(espClient);
 
 // VARIABLES
 unsigned long lastMsg = 0;
-char msg[MSG_BUFFER_SIZE];
 bool mqtt_in_onoff;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
@@ -58,8 +55,8 @@ void loop() {
       
       
     if(mqtt_in_getparams){
-       mqtt_send_params();
-       mqtt_in_getparams=false;
+      mqtt_send_params();
+      mqtt_in_getparams=false;
     }
   }
   delay(1000);
@@ -116,9 +113,7 @@ void mqtt_send_data(){
   Serial.print(Pv);
   Serial.print(" cp ");
   Serial.println(Cp);
-  sprintf(data, "%f;%f;%f;%ld", setp,Pv,Cp,Time);
-  
-  
+  sprintf(data, "%f;%f;%f;%ld", setp,Pv,Cp,Time);  
   Serial.print("Publish message: ");
   Serial.println(data);  
   client.publish("plant2/data", data);
@@ -126,7 +121,6 @@ void mqtt_send_data(){
 
 void mqtt_send_params(){
   char data1[50];
-
   sprintf(data1, "%f;%f;%f;%f;%c", setp,Kp,Ti,Td,on_off);
   Serial.print("Publish message: ");
   Serial.println(data1);
@@ -141,17 +135,13 @@ void setup_wifi() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-
   randomSeed(micros());
-
   Serial.println("");
   Serial.println("WiFi connected");
 }
@@ -168,19 +158,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println("] ");
   
   if (String(topic) == "plant2/on_off"){
-    //Serial.print("Se ejecuto la condicion del topic on_off");
-
+    
     for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
     }
     inmsg[length] = '\0';
     on_off=inmsg[0];
     mqtt_in_onoff = String(inmsg) == "1";
-    //Serial.print(mqtt_in_onoff);
+    
    
     
   } else if (String(topic) == "plant2/get_parameters"){
-      //Serial.print("Se ejecuto la condicion del topic get params");
+      
       for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
       }
@@ -192,12 +181,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
   } else if (String(topic) == "plant2/update_parameters") {
     float inc_setp,inc_kp,inc_ti,inc_td;
       
-      //Serial.print("Se ejecuto la condicion del topic update params");  
+      
       for (int i = 0; i < length; i++) {
         inmsg[i] = (char)payload[i];
       }
       inmsg[length]='\0';
-      //Serial.print(inmsg);
+      
       sscanf(inmsg,"%f;%f;%f;%f",&inc_setp,&inc_kp,&inc_ti,&inc_td);
            
       setp=inc_setp;

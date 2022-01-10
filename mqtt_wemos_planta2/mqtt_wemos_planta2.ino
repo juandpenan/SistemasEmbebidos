@@ -8,9 +8,9 @@
 //MQTT COMMUNICATION PARAMETERS
 #define MSG_BUFFER_SIZE  50
 
-const char* ssid = "WIFI_4C";//"udcdocencia"
-const char* password = "chontaduroexternocleidomastoideo"; //Universidade.2022
-const char* mqtt_server = "192.168.1.64";
+const char* ssid = "udcdocencia"; // "WIFI_4C";//
+const char* password = "Universidade.2022"; // "chontaduroexternocleidomastoideo"; //
+const char* mqtt_server = "10.20.30.242";//"192.168.1.64";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -62,8 +62,9 @@ void loop() {
        mqtt_in_getparams=false;
     }
   }
-       
   delay(1000);
+       
+ 
 }
 
 
@@ -108,8 +109,16 @@ void i2c_send_params(){
 
 void mqtt_send_data(){
   char data[50];
-
+  Serial.print("Data a enviar ");
+   Serial.print(" setpoint ");
+  Serial.print(setp);
+   Serial.print(" pv ");
+  Serial.print(Pv);
+  Serial.print(" cp ");
+  Serial.println(Cp);
   sprintf(data, "%f;%f;%f;%ld", setp,Pv,Cp,Time);
+  
+  
   Serial.print("Publish message: ");
   Serial.println(data);  
   client.publish("plant2/data", data);

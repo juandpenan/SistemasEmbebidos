@@ -7,9 +7,9 @@
 //MQTT COMMUNICATION PARAMETERS
 #define MSG_BUFFER_SIZE  (50)
 
-const char* ssid = "WIFI_4C";//"udcdocencia"
-const char* password = "chontaduroexternocleidomastoideo"; //Universidade.2022
-const char* mqtt_server = "192.168.1.64";
+const char* ssid = "udcdocencia"; // "WIFI_4C";//
+const char* password = "Universidade.2022"; // "chontaduroexternocleidomastoideo"; //
+const char* mqtt_server = "10.20.30.242";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -22,7 +22,6 @@ bool mqtt_in_onoff;
 bool mqtt_in_getparams;
 char* mqtt_in_updtparams;
 char params[100];
-int value = 0;
 double setp =30;
 double Kp =1;
 double Ti =8.14;
@@ -33,7 +32,7 @@ int Time;
 char on_off;
 
 
-
+bool can_send = true;
 
 
 void setup() {
@@ -64,37 +63,52 @@ void loop() {
       mqtt_in_getparams=false;
     }  
   }
-    
+  
   delay(1000);
+  
 }
 
 
 void uart_receive_data(){
-  
-  if(Serial.available()){
-
+  if(Serial.available())
+    Serial.read(); 
+  if(Serial.available())
     Pv = Serial.parseFloat();
+  if(Serial.available())
     Cp = Serial.parseFloat();
+  if(Serial.available())
     Time = Serial.parseInt();
-  }
-      
+
+  Serial.println('k');
 }
 
 void uart_send_params(){
-
+  while(!can_send){}
+  can_send=false;
+  Serial.println('s');
   Serial.println(setp);
   Serial.println(Kp);
   Serial.println(Ti);
   Serial.println(Td);
   Serial.println(on_off);
+
+  wait_for_ok();
+}
+
+void wait_for_ok(){
+
+   while(!Serial.available()){}
+
+   char ok = Serial.read();
+   can_send = true;
 }
 
 void mqtt_send_data(){
   char data[50];
 
   sprintf(data, "%f;%f;%f;%ld", setp,Pv,Cp,Time);
-  Serial.print("Publish message: ");
-  Serial.println(data);  
+//  Serial.print("Publish message: ");
+//  Serial.println(data);  
   client.publish("plant1/data", data);
 }
 
@@ -102,8 +116,8 @@ void mqtt_send_params(){
   char data1[50];
 
   sprintf(data1, "%f;%f;%f;%f;%c", setp,Kp,Ti,Td,on_off);
-  Serial.print("Publish message: ");
-  Serial.println(data1);
+//  Serial.print("Publish message: ");
+//  Serial.println(data1);
   client.publish("plant1/parameters", data1);
 }
 
@@ -112,22 +126,22 @@ void mqtt_send_params(){
 void setup_wifi() {
 
   delay(10);
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+//  Serial.println();
+//  Serial.print("Connecting to ");
+//  Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+//    Serial.print(".");
   }
 
   randomSeed(micros());
 
-  Serial.println("");
-  Serial.println("WiFi connected");
+//  Serial.println("");
+//  Serial.println("WiFi connected");
   
 }
 
@@ -138,9 +152,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
   char inmsg[length+1];
   
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.println("] ");
+//  Serial.print("Message arrived [");
+//  Serial.print(topic);
+//  Serial.println("] ");
   
   if (String(topic) == "plant1/on_off"){
     //Serial.print("Se ejecuto la condicion del topic on_off");
@@ -191,19 +205,19 @@ void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     
-    Serial.print("Attempting MQTT connection...");
+//    Serial.print("Attempting MQTT connection...");
     // Create a random client ID
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
   
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
-      Serial.println("connected");
+//      Serial.println("connected");
       client.subscribe("plant1/on_off");
       client.subscribe("plant1/get_parameters");
       client.subscribe("plant1/update_parameters");
     } else {
-      Serial.print("failed, rc=");
+//      Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying

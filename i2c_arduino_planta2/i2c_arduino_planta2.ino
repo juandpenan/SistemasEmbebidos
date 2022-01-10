@@ -10,13 +10,13 @@
 
 //...................... VARIABLES....................................//
 double PV=0;   // Process value 
-double setp=30;   // Set point
+double setp;   // Set point
 double ERR=0;  // Error
-double CP=0;   // Control process
+double CP;   // Control process
 int Ts=1000;   // Sample time 1s
-double Kp=1;   // Proportional constant
-double Ti=8.14;   // Integrative constant
-double Td=1.02;   // Derivative constant
+double Kp;   // Proportional constant
+double Ti;   // Integrative constant
+double Td;   // Derivative constant
 
 char bufferparameters[50]; 
 char bufferdata[50]; 
@@ -56,24 +56,40 @@ void loop() {
   }  
   
 
-  delay(1000);
+  
   unsigned long CurrentTime = millis();
   unsigned long ElapsedTime = CurrentTime - StartTime;
   
   now = ElapsedTime /1000;
+
+ if (now < 1){
+  now=1;
+  Serial.println(now);
+  }
+  delay(1000);
+ 
   
 }
 
 
 void Parseinfo(){
   
-  char str_PV[6];
-  char str_CP[6];
+  char str_PV[8];
+  char str_CP[8];
   
   dtostrf(PV,3,2,str_PV);
   dtostrf(CP,3,2,str_CP);
-  
+//  Serial.print("String pV: ");
+//  Serial.print(str_PV);
+//  Serial.print(" PV: ");
+//  Serial.print(PV);
+//  Serial.print("String CP: ");
+//  Serial.print(str_CP);
+//  Serial.print(" CP: ");
+//  Serial.print(CP);
   sprintf(bufferdata,"%s;%s;%d",str_PV,str_CP,now);
+//  Serial.print(" bufferdata : ");
+//  Serial.println(bufferdata);
   
   String s_setp,s_kp,s_ti,s_td,s_on_off;
   
@@ -122,6 +138,7 @@ void comunicationIN(int bytes){
 void comunicationOUT(){ 
   
   Wire.write(bufferdata);
+  Serial.println(bufferdata);
 
 }
 
@@ -129,14 +146,23 @@ void PID() {
   
   myPID.SetSampleTime(Ts);
   myPID.SetTunings(Kp,Ti,Td);
-  
+//  Serial.print("Parameters KP, Ti, Td :");
+//  Serial.print(Kp);
+//  Serial.print(",");
+//  Serial.print(Ti);
+//  Serial.print(",");
+//  Serial.println(Td);  
   double tmp =analogRead(InputPin);
   
   PV= (tmp*(100/1023.0));
+//  Serial.print("PV and SETP ");
+//  Serial.print(PV);
+//  Serial.print(" ; ");
+//  Serial.print(setp);
   
   myPID.Compute();
-  
+
   analogWrite(OutputPin,CP);
   
-  CP=CP* (100.0/250.0);
+  CP=CP* (100.0/255.0);
 }
